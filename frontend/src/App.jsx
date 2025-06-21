@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import Sidebar from './components/Layout/Sidebar';
+import Header from './components/Layout/Header';
+import DashboardView from './components/Dashboard/DashboardView';
+import CalendarView from './components/Calendar/CalendarView';
+import CoursesView from './components/Courses/CoursesView';
+import TasksView from './components/Tasks/TasksView';
+import ProgressView from './components/Progress/ProgressView';
+import ProfileView from './components/Profile/ProfileView';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardView />;
+      case 'calendar':
+        return <CalendarView />;
+      case 'courses':
+        return <CoursesView />;
+      case 'tasks':
+        return <TasksView />;
+      case 'progress':
+        return <ProgressView />;
+      case 'profile':
+        return <ProfileView />;
+      case 'settings':
+        return (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+            <p className="text-gray-500 mt-2">Settings page coming soon...</p>
+          </div>
+        );
+      default:
+        return <DashboardView />;
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Provider store={store}>
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-y-auto">
+            {renderContent()}
+          </main>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Provider>
+  );
 }
 
-export default App
+export default App;
