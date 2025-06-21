@@ -7,6 +7,7 @@ import { authRouter } from './routes/auth.js';
 import connectDB from './config/db.js';
 import { userRouter } from './routes/users.js';
 import { courseRoutes } from './routes/courses.js';
+import { taskRoutes } from './routes/tasks.js';
 
 
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/users',userRouter);
 app.use('/api/courses', courseRoutes);
+app.use('/api/tasks', taskRoutes);
 
 
 app.get('/api/health',(req, res) => {
