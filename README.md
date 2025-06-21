@@ -126,3 +126,31 @@ academic_planner/
 │   └── package.json
 └── README.md
 ```
+
+## Development
+
+### Adding New Features
+1. Create new components in the appropriate directory
+2. Add Redux slices for state management if needed
+3. Update routing in `App.tsx`
+4. Add API endpoints in the backend if required
+
+### Styling
+The application uses Tailwind CSS for styling. All components are styled using utility classes.
+
+### State Management
+Redux Toolkit is used for state management. The main slices are:
+- `authSlice` - Authentication state
+- Other slices for courses, tasks, etc.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License. 
