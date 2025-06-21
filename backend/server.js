@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/auth.js';
-import { userRouter } from './routes/users.js';
+
 
 import connectDB from './config/db.js';
+import { userRouter } from './routes/users.js';
+import { courseRoutes } from './routes/courses.js';
 
 
 
@@ -21,6 +23,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users',userRouter);
+app.use('/api/courses', courseRoutes);
+
 
 app.get('/api/health',(req, res) => {
     res.json({status:'OK', message: 'Academic Planner API is running'});
