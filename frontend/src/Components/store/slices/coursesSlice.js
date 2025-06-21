@@ -1,28 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface Course {
-  id: string;
-  name: string;
-  code: string;
-  credits: number;
-  color: string;
-  instructor: string;
-  schedule: {
-    day: string;
-    startTime: string;
-    endTime: string;
-    location: string;
-  }[];
-  description?: string;
-}
-
-interface CoursesState {
-  courses: Course[];
-  selectedCourse: Course | null;
-  loading: boolean;
-}
-
-const initialState: CoursesState = {
+const initialState = {
   courses: [
     {
       id: '1',
@@ -72,29 +50,37 @@ const coursesSlice = createSlice({
   name: 'courses',
   initialState,
   reducers: {
-    setCourses: (state, action: PayloadAction<Course[]>) => {
+    setCourses: (state, action) => {
       state.courses = action.payload;
     },
-    addCourse: (state, action: PayloadAction<Course>) => {
+    addCourse: (state, action) => {
       state.courses.push(action.payload);
     },
-    updateCourse: (state, action: PayloadAction<Course>) => {
+    updateCourse: (state, action) => {
       const index = state.courses.findIndex(course => course.id === action.payload.id);
       if (index !== -1) {
         state.courses[index] = action.payload;
       }
     },
-    deleteCourse: (state, action: PayloadAction<string>) => {
+    deleteCourse: (state, action) => {
       state.courses = state.courses.filter(course => course.id !== action.payload);
     },
-    setSelectedCourse: (state, action: PayloadAction<Course | null>) => {
+    setSelectedCourse: (state, action) => {
       state.selectedCourse = action.payload;
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
+    setLoading: (state, action) => {
       state.loading = action.payload;
     },
   },
 });
 
-export const { setCourses, addCourse, updateCourse, deleteCourse, setSelectedCourse, setLoading } = coursesSlice.actions;
+export const {
+  setCourses,
+  addCourse,
+  updateCourse,
+  deleteCourse,
+  setSelectedCourse,
+  setLoading,
+} = coursesSlice.actions;
+
 export default coursesSlice.reducer;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../hooks/useAppSelector';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { addStudySession, updateGoals } from '../../store/slices/progressSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { addStudySession,updateGoals } from '../store/slices/progressSlice';
+
 import { 
   Clock, 
   TrendingUp, 

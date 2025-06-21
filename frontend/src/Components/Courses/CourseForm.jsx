@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { addCourse, updateCourse } from '../../store/slices/coursesSlice';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { addCourse,updateCourse } from '../store/slices/coursesSlice';
 import { X, Plus, Trash2 } from 'lucide-react';
 
 

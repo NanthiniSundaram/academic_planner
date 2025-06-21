@@ -1,29 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface ScheduleItem {
-  id: string;
-  title: string;
-  type: 'class' | 'study' | 'break' | 'exam' | 'meeting';
-  startTime: string;
-  endTime: string;
-  date: string;
-  courseId?: string;
-  taskId?: string;
-  location?: string;
-  description?: string;
-  color: string;
-  isRecurring: boolean;
-  recurringPattern?: 'daily' | 'weekly' | 'monthly';
-}
-
-interface ScheduleState {
-  items: ScheduleItem[];
-  selectedDate: string;
-  viewMode: 'day' | 'week' | 'month';
-  loading: boolean;
-}
-
-const initialState: ScheduleState = {
+const initialState = {
   items: [
     {
       id: '1',
@@ -74,32 +51,41 @@ const scheduleSlice = createSlice({
   name: 'schedule',
   initialState,
   reducers: {
-    setItems: (state, action: PayloadAction<ScheduleItem[]>) => {
+    setItems: (state, action) => {
       state.items = action.payload;
     },
-    addItem: (state, action: PayloadAction<ScheduleItem>) => {
+    addItem: (state, action) => {
       state.items.push(action.payload);
     },
-    updateItem: (state, action: PayloadAction<ScheduleItem>) => {
+    updateItem: (state, action) => {
       const index = state.items.findIndex(item => item.id === action.payload.id);
       if (index !== -1) {
         state.items[index] = action.payload;
       }
     },
-    deleteItem: (state, action: PayloadAction<string>) => {
+    deleteItem: (state, action) => {
       state.items = state.items.filter(item => item.id !== action.payload);
     },
-    setSelectedDate: (state, action: PayloadAction<string>) => {
+    setSelectedDate: (state, action) => {
       state.selectedDate = action.payload;
     },
-    setViewMode: (state, action: PayloadAction<'day' | 'week' | 'month'>) => {
+    setViewMode: (state, action) => {
       state.viewMode = action.payload;
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
+    setLoading: (state, action) => {
       state.loading = action.payload;
     },
   },
 });
 
-export const { setItems, addItem, updateItem, deleteItem, setSelectedDate, setViewMode, setLoading } = scheduleSlice.actions;
+export const {
+  setItems,
+  addItem,
+  updateItem,
+  deleteItem,
+  setSelectedDate,
+  setViewMode,
+  setLoading,
+} = scheduleSlice.actions;
+
 export default scheduleSlice.reducer;

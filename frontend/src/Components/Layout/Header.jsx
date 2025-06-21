@@ -1,6 +1,6 @@
 import React from 'react';
 import { Bell, Search, User } from 'lucide-react';
-import { useAppSelector } from '../../hooks/useAppSelector';
+import { useAppSelector } from '../hooks/useAppSelector';
 
 const Header = () => {
   const { profile } = useAppSelector((state) => state.user);

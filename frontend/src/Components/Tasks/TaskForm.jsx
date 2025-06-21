@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { useAppSelector } from '../../hooks/useAppSelector';
-import { addTask, updateTask } from '../../store/slices/tasksSlice';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { addTask, updateTask } from '../store/slices/tasksSlice';
 import { X } from 'lucide-react';
 
 const TaskForm = ({ isOpen, onClose, editingTask }) => {

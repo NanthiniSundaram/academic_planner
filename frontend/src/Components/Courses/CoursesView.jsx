@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../hooks/useAppSelector';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { deleteCourse } from '../../store/slices/coursesSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { deleteCourse } from '../store/slices/coursesSlice';
 import { Book, Clock, MapPin, User, Plus, Edit2, Trash2, Users } from 'lucide-react';
 import CourseForm from './CourseForm';
 
@@ -11,7 +11,7 @@ const CoursesView = () => {
   const { tasks } = useAppSelector((state) => state.tasks);
   
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editingCourse, setEditingCourse] = useState(null);
 
   const getCourseStats = (courseId) => {
     const courseTasks = tasks.filter(task => task.courseId === courseId);

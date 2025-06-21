@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../hooks/useAppSelector';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { updateTask, setFilter } from '../../store/slices/tasksSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { updateTask,setFilter } from '../store/slices/tasksSlice';
 import { CheckSquare, Clock, Filter, Plus, Calendar, Edit2 } from 'lucide-react';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import TaskForm from './TaskForm';
@@ -13,7 +13,7 @@ const TasksView = () => {
   const { courses } = useAppSelector((state) => state.courses);
   
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState(null);
 
   const filteredTasks = tasks.filter(task => {
     if (filter.status !== 'all' && task.status !== filter.status) return false;

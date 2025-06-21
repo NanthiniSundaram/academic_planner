@@ -15,7 +15,7 @@ const CalendarView = () => {
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<ScheduleItem | null>(null);
+  const [editingItem, setEditingItem] = useState(null);
 
   const handlePrevWeek = () => {
     setCurrentDate(subWeeks(currentDate, 1));

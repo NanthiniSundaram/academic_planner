@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../hooks/useAppSelector';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { updateProfile } from '../../store/slices/userSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { updateProfile } from '../store/slices/userSlice';
 import { User, Mail, Target, Clock, Calendar, Edit2, Save, X } from 'lucide-react';
 
 const ProfileView = () => {

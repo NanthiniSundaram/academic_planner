@@ -1,34 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  type: 'assignment' | 'exam' | 'project' | 'study' | 'reading';
-  courseId: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'pending' | 'in-progress' | 'completed' | 'overdue';
-  estimatedDuration: number; // in minutes
-  actualDuration?: number; // in minutes
-  tags: string[];
-  createdAt: string;
-  completedAt?: string;
-}
-
-interface TasksState {
-  tasks: Task[];
-  selectedTask: Task | null;
-  filter: {
-    status: string;
-    priority: string;
-    type: string;
-    courseId: string;
-  };
-  loading: boolean;
-}
-
-const initialState: TasksState = {
+const initialState = {
   tasks: [
     {
       id: '1',
@@ -85,32 +57,41 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    setTasks: (state, action: PayloadAction<Task[]>) => {
+    setTasks: (state, action) => {
       state.tasks = action.payload;
     },
-    addTask: (state, action: PayloadAction<Task>) => {
+    addTask: (state, action) => {
       state.tasks.push(action.payload);
     },
-    updateTask: (state, action: PayloadAction<Task>) => {
+    updateTask: (state, action) => {
       const index = state.tasks.findIndex(task => task.id === action.payload.id);
       if (index !== -1) {
         state.tasks[index] = action.payload;
       }
     },
-    deleteTask: (state, action: PayloadAction<string>) => {
+    deleteTask: (state, action) => {
       state.tasks = state.tasks.filter(task => task.id !== action.payload);
     },
-    setSelectedTask: (state, action: PayloadAction<Task | null>) => {
+    setSelectedTask: (state, action) => {
       state.selectedTask = action.payload;
     },
-    setFilter: (state, action: PayloadAction<Partial<TasksState['filter']>>) => {
+    setFilter: (state, action) => {
       state.filter = { ...state.filter, ...action.payload };
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
+    setLoading: (state, action) => {
       state.loading = action.payload;
     },
   },
 });
 
-export const { setTasks, addTask, updateTask, deleteTask, setSelectedTask, setFilter, setLoading } = tasksSlice.actions;
+export const {
+  setTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+  setSelectedTask,
+  setFilter,
+  setLoading,
+} = tasksSlice.actions;
+
 export default tasksSlice.reducer;

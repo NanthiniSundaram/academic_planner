@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Provider } from 'react-redux';
-import { store } from './store';
-import Sidebar from './components/Layout/Sidebar';
-import Header from './components/Layout/Header';
-import DashboardView from './components/Dashboard/DashboardView';
-import CalendarView from './components/Calendar/CalendarView';
-import CoursesView from './components/Courses/CoursesView';
-import TasksView from './components/Tasks/TasksView';
-import ProgressView from './components/Progress/ProgressView';
-import ProfileView from './components/Profile/ProfileView';
+import { store } from './Components/store';
+import Sidebar from './Components/Layout/Sidebar';
+import Header from './Components/Layout/Header';
+import DashboardView from './Components/Dashboard/DashboardView';
+import CalendarView from './Components/Calendar/CalendarView';
+import CoursesView from './Components/Courses/CoursesView';
+import TasksView from './Components/Tasks/TasksView';
+import ProgressView from './Components/Progress/ProgressView';
+import ProfileView from './Components/Profile/ProfileView';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
