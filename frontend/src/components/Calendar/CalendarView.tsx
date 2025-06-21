@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { setViewMode, setSelectedDate } from '../../store/slices/scheduleSlice';
+import { setViewMode, setSelectedDate, setEventModalOpen, deleteScheduleItem, getSchedule } from '../../store/slices/scheduleSlice';
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from 'date-fns';
+import AddEventModal from './AddEventModal';
+import EditEventModal from './EditEventModal';
+import { ScheduleItem } from '../../store/slices/scheduleSlice';
 
 const CalendarView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { items, selectedDate, viewMode } = useAppSelector((state) => state.schedule);
+  const { items, selectedDate, viewMode, isEventModalOpen } = useAppSelector((state) => state.schedule);
   const { courses } = useAppSelector((state) => state.courses);
   const { tasks } = useAppSelector((state) => state.tasks);
   
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<ScheduleItem | null>(null);
+
+  useEffect(() => {
+    dispatch(getSchedule());
+  }, [dispatch]);
 
   const handlePrevWeek = () => {
     setCurrentDate(subWeeks(currentDate, 1));
@@ -25,6 +34,17 @@ const CalendarView: React.FC = () => {
     dispatch(setSelectedDate(date.toISOString().split('T')[0]));
   };
 
+  const handleDelete = (itemId: string) => {
+    if (window.confirm('Are you sure you want to delete this event?')) {
+      dispatch(deleteScheduleItem(itemId));
+    }
+  };
+
+  const handleEdit = (item: ScheduleItem) => {
+    setSelectedEvent(item);
+    setIsEditModalOpen(true);
+  };
+
   const getWeekDays = () => {
     const start = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
     return Array.from({ length: 7 }, (_, i) => addDays(start, i));
@@ -32,7 +52,7 @@ const CalendarView: React.FC = () => {
 
   const getItemsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return items.filter(item => item.date === dateStr);
+    return items.filter(item => item.date.startsWith(dateStr));
   };
 
   const getTasksForDate = (date: Date) => {
@@ -44,7 +64,7 @@ const CalendarView: React.FC = () => {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6" key={viewMode}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -59,7 +79,7 @@ const CalendarView: React.FC = () => {
             {['day', 'week', 'month'].map((mode) => (
               <button
                 key={mode}
-                onClick={() => dispatch(setViewMode(mode as any))}
+                onClick={() => dispatch(setViewMode(mode as 'day' | 'week' | 'month'))}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   viewMode === mode
                     ? 'bg-white text-gray-900 shadow-sm'
@@ -86,7 +106,9 @@ const CalendarView: React.FC = () => {
             </button>
           </div>
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => dispatch(setEventModalOpen(true))}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors">
             <Plus className="w-4 h-4" />
             <span>Add Event</span>
           </button>
@@ -180,7 +202,24 @@ const CalendarView: React.FC = () => {
                             style={{ zIndex: 5 }}
                           >
                             <div className="font-medium truncate">{task.title}</div>
-                            <div className="opacity-75 truncate">Due: {format(new Date(task.dueDate), 'h:mm a')}</div>
+                            <div className="text-sm text-gray-500">
+                              Due: {format(new Date(task.dueDate), 'h:mm a')} • {course?.code}
+                            </div>
+                            <div className="flex space-x-2">
+                              <button className="p-1 hover:bg-orange-100 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                              </button>
+                              <button className="p-1 hover:bg-orange-100 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                              </button>
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                              task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}>
+                              {task.priority}
+                            </span>
                           </div>
                         );
                       }
@@ -214,6 +253,14 @@ const CalendarView: React.FC = () => {
                   {item.location && ` • ${item.location}`}
                 </div>
               </div>
+              <div className="flex space-x-2">
+                <button onClick={() => handleEdit(item)} className="p-1 hover:bg-gray-200 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </button>
+                <button onClick={() => handleDelete(item.id)} className="p-1 hover:bg-gray-200 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
+              </div>
               <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
                 {item.type}
               </span>
@@ -231,6 +278,14 @@ const CalendarView: React.FC = () => {
                     Due: {format(new Date(task.dueDate), 'h:mm a')} • {course?.code}
                   </div>
                 </div>
+                <div className="flex space-x-2">
+                  <button className="p-1 hover:bg-orange-100 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  </button>
+                  <button className="p-1 hover:bg-orange-100 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </button>
+                </div>
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
                   task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
@@ -247,6 +302,8 @@ const CalendarView: React.FC = () => {
           )}
         </div>
       </div>
+      <AddEventModal isOpen={isEventModalOpen} onClose={() => dispatch(setEventModalOpen(false))} />
+      <EditEventModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} event={selectedEvent} />
     </div>
   );
 };

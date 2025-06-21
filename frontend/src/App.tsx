@@ -1,55 +1,55 @@
-import React, { useState } from 'react';
-import { Provider } from 'react-redux';
-import { store } from './store';
-import Sidebar from './components/Layout/Sidebar';
-import Header from './components/Layout/Header';
-import DashboardView from './components/Dashboard/DashboardView';
-import CalendarView from './components/Calendar/CalendarView';
-import CoursesView from './components/Courses/CoursesView';
-import TasksView from './components/Tasks/TasksView';
-import AIInsightsView from './components/AI/AIInsightsView';
-import ProfileView from './components/Profile/ProfileView';
+import React from 'react';
+import { Provider, useSelector } from 'react-redux';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { store, RootState } from './store';
+import Layout from './components/Layout/Layout';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import Home from './components/Home/Home';
+
+const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  return isAuthenticated ? <Navigate to="/dashboard" /> : children;
+};
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardView />;
-      case 'calendar':
-        return <CalendarView />;
-      case 'courses':
-        return <CoursesView />;
-      case 'tasks':
-        return <TasksView />;
-      case 'ai-insights':
-        return <AIInsightsView />;
-      case 'profile':
-        return <ProfileView />;
-      case 'settings':
-        return (
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-            <p className="text-gray-500 mt-2">Settings page coming soon...</p>
-          </div>
-        );
-      default:
-        return <DashboardView />;
-    }
-  };
-
   return (
     <Provider store={store}>
-      <div className="min-h-screen bg-gray-50 flex">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header />
-          <main className="flex-1 overflow-y-auto">
-            {renderContent()}
-          </main>
-        </div>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route 
+            path="/login" 
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/*" 
+            element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            } 
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
     </Provider>
   );
 }

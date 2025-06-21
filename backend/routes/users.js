@@ -92,4 +92,4 @@ router.get('/dashboard', protect, async (req, res) => {
     }
 });
   
-  export const userRouter = router; 
+export default router; 

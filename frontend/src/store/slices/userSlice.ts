@@ -1,9 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { User } from '../../types';
 
-interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
+export interface UserProfile extends User {
   studyPreferences: {
     preferredStudyTime: 'morning' | 'afternoon' | 'evening' | 'night';
     sessionDuration: number; // in minutes
@@ -22,9 +20,13 @@ interface UserState {
 
 const initialState: UserState = {
   profile: {
-    id: '1',
+    _id: '1',
     name: 'Sarah Johnson',
     email: 'sarah.johnson@university.edu',
+    studentId: '12345',
+    major: 'Computer Science',
+    year: 'Senior',
+    preferences: {},
     studyPreferences: {
       preferredStudyTime: 'morning',
       sessionDuration: 60,

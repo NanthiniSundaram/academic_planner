@@ -154,4 +154,4 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
-export const courseRoutes = router; 
+export default router; 

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { updateTask, setFilter } from '../../store/slices/tasksSlice';
-import { CheckSquare, Clock, AlertCircle, Filter, Plus, Calendar } from 'lucide-react';
+import { updateTask, setFilter, Task } from '../../store/slices/tasksSlice';
+import { CheckSquare, Clock, Filter, Plus, Calendar } from 'lucide-react';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
+import AddTaskModal from './AddTaskModal';
 
 const TasksView: React.FC = () => {
   const dispatch = useAppDispatch();
   const { tasks, filter } = useAppSelector((state) => state.tasks);
   const { courses } = useAppSelector((state) => state.courses);
   
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredTasks = tasks.filter(task => {
     if (filter.status !== 'all' && task.status !== filter.status) return false;
@@ -28,7 +29,7 @@ const TasksView: React.FC = () => {
     overdue: tasks.filter(t => t.status === 'overdue' || (isPast(new Date(t.dueDate)) && t.status !== 'completed')).length,
   };
 
-  const handleTaskUpdate = (taskId: string, updates: any) => {
+  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
       dispatch(updateTask({ ...task, ...updates }));
@@ -62,7 +63,7 @@ const TasksView: React.FC = () => {
     return { text: format(due, 'MMM dd, yyyy'), color: 'text-gray-600' };
   };
 
-  const TaskCard = ({ task }: { task: any }) => {
+  const TaskCard = ({ task }: { task: Task }) => {
     const course = courses.find(c => c.id === task.courseId);
     const dueDateStatus = getDueDateStatus(task.dueDate);
     
@@ -163,7 +164,7 @@ const TasksView: React.FC = () => {
         </div>
         
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => setShowAddModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -250,8 +251,8 @@ const TasksView: React.FC = () => {
             className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Courses</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>{course.code}</option>
+            {courses.map(course => (
+              <option key={course.id} value={course.id}>{course.name}</option>
             ))}
           </select>
         </div>
@@ -263,6 +264,8 @@ const TasksView: React.FC = () => {
           <TaskCard key={task.id} task={task} />
         ))}
       </div>
+
+      <AddTaskModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
 
       {filteredTasks.length === 0 && (
         <div className="text-center py-12">
@@ -276,7 +279,7 @@ const TasksView: React.FC = () => {
           </p>
           {tasks.length === 0 && (
             <button
-              onClick={() => setShowAddForm(true)}
+              onClick={() => setShowAddModal(true)}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Add Your First Task

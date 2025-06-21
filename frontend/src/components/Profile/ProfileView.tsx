@@ -1,17 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { updateProfile } from '../../store/slices/userSlice';
-import { User, Mail, Target, Clock, Calendar, Edit2, Save, X } from 'lucide-react';
+import { updateProfile, UserProfile } from '../../store/slices/userSlice';
+import { User, Target, Clock, Calendar, Edit2, Save, X } from 'lucide-react';
+
+const defaultProfile: UserProfile = {
+    _id: '',
+    name: '',
+    email: '',
+    studentId: '',
+    major: '',
+    year: '',
+    preferences: {},
+    studyPreferences: {
+        preferredStudyTime: 'morning',
+        sessionDuration: 60,
+        breakDuration: 15,
+        studyDaysPerWeek: 5,
+    },
+    academicGoals: [],
+};
 
 const ProfileView: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { profile } = useAppSelector((state) => state.user);
+  const { user: profile } = useAppSelector((state) => state.auth);
   const { courses } = useAppSelector((state) => state.courses);
   const { tasks } = useAppSelector((state) => state.tasks);
   
   const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState(profile);
+  const [editedProfile, setEditedProfile] = useState<UserProfile>(profile as UserProfile || defaultProfile);
+
+  useEffect(() => {
+    setEditedProfile(profile as UserProfile || defaultProfile);
+  }, [profile]);
 
   const handleSave = () => {
     if (editedProfile) {
@@ -21,14 +42,14 @@ const ProfileView: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setEditedProfile(profile);
+    setEditedProfile(profile as UserProfile || defaultProfile);
     setIsEditing(false);
   };
 
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
 
-  if (!profile) return null;
+  const currentProfile = profile as UserProfile || defaultProfile;
 
   return (
     <div className="p-6 space-y-6">
@@ -86,11 +107,11 @@ const ProfileView: React.FC = () => {
                       <input
                         type="text"
                         value={editedProfile?.name || ''}
-                        onChange={(e) => setEditedProfile(prev => prev ? { ...prev, name: e.target.value } : null)}
+                        onChange={(e) => setEditedProfile(prev => ({ ...prev, name: e.target.value } as UserProfile))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     ) : (
-                      <p className="text-gray-900 font-medium">{profile.name}</p>
+                      <p className="text-gray-900 font-medium">{currentProfile.name}</p>
                     )}
                   </div>
                   
@@ -100,11 +121,11 @@ const ProfileView: React.FC = () => {
                       <input
                         type="email"
                         value={editedProfile?.email || ''}
-                        onChange={(e) => setEditedProfile(prev => prev ? { ...prev, email: e.target.value } : null)}
+                        onChange={(e) => setEditedProfile(prev => ({ ...prev, email: e.target.value } as UserProfile))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     ) : (
-                      <p className="text-gray-900">{profile.email}</p>
+                      <p className="text-gray-900">{currentProfile.email}</p>
                     )}
                   </div>
                 </div>
@@ -121,14 +142,14 @@ const ProfileView: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Study Time</label>
                 {isEditing ? (
                   <select
-                    value={editedProfile?.studyPreferences.preferredStudyTime || 'morning'}
-                    onChange={(e) => setEditedProfile(prev => prev ? {
+                    value={editedProfile?.studyPreferences?.preferredStudyTime || 'morning'}
+                    onChange={(e) => setEditedProfile(prev => ({
                       ...prev,
                       studyPreferences: {
                         ...prev.studyPreferences,
-                        preferredStudyTime: e.target.value as any
+                        preferredStudyTime: e.target.value as UserProfile['studyPreferences']['preferredStudyTime']
                       }
-                    } : null)}
+                    } as UserProfile))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="morning">Morning</option>
@@ -137,7 +158,7 @@ const ProfileView: React.FC = () => {
                     <option value="night">Night</option>
                   </select>
                 ) : (
-                  <p className="text-gray-900 capitalize">{profile.studyPreferences.preferredStudyTime}</p>
+                  <p className="text-gray-900 capitalize">{currentProfile.studyPreferences?.preferredStudyTime}</p>
                 )}
               </div>
 
@@ -146,18 +167,18 @@ const ProfileView: React.FC = () => {
                 {isEditing ? (
                   <input
                     type="number"
-                    value={editedProfile?.studyPreferences.sessionDuration || 60}
-                    onChange={(e) => setEditedProfile(prev => prev ? {
+                    value={editedProfile?.studyPreferences?.sessionDuration || 60}
+                    onChange={(e) => setEditedProfile(prev => ({
                       ...prev,
                       studyPreferences: {
                         ...prev.studyPreferences,
                         sessionDuration: parseInt(e.target.value)
                       }
-                    } : null)}
+                    } as UserProfile))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile.studyPreferences.sessionDuration} minutes</p>
+                  <p className="text-gray-900">{currentProfile.studyPreferences?.sessionDuration} minutes</p>
                 )}
               </div>
 
@@ -166,18 +187,18 @@ const ProfileView: React.FC = () => {
                 {isEditing ? (
                   <input
                     type="number"
-                    value={editedProfile?.studyPreferences.breakDuration || 15}
-                    onChange={(e) => setEditedProfile(prev => prev ? {
+                    value={editedProfile?.studyPreferences?.breakDuration || 15}
+                    onChange={(e) => setEditedProfile(prev => ({
                       ...prev,
                       studyPreferences: {
                         ...prev.studyPreferences,
                         breakDuration: parseInt(e.target.value)
                       }
-                    } : null)}
+                    } as UserProfile))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile.studyPreferences.breakDuration} minutes</p>
+                  <p className="text-gray-900">{currentProfile.studyPreferences?.breakDuration} minutes</p>
                 )}
               </div>
 
@@ -188,18 +209,18 @@ const ProfileView: React.FC = () => {
                     type="number"
                     min="1"
                     max="7"
-                    value={editedProfile?.studyPreferences.studyDaysPerWeek || 5}
-                    onChange={(e) => setEditedProfile(prev => prev ? {
+                    value={editedProfile?.studyPreferences?.studyDaysPerWeek || 5}
+                    onChange={(e) => setEditedProfile(prev => ({
                       ...prev,
                       studyPreferences: {
                         ...prev.studyPreferences,
                         studyDaysPerWeek: parseInt(e.target.value)
                       }
-                    } : null)}
+                    } as UserProfile))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile.studyPreferences.studyDaysPerWeek} days</p>
+                  <p className="text-gray-900">{currentProfile.studyPreferences?.studyDaysPerWeek} days</p>
                 )}
               </div>
             </div>
@@ -210,7 +231,7 @@ const ProfileView: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Academic Goals</h3>
             
             <div className="space-y-3">
-              {profile.academicGoals.map((goal, index) => (
+              {currentProfile.academicGoals?.map((goal: string, index: number) => (
                 <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                   <Target className="w-5 h-5 text-blue-600" />
                   <span className="text-gray-900">{goal}</span>

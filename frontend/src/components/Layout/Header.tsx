@@ -1,9 +1,13 @@
 import React from 'react';
-import { Bell, Search, User } from 'lucide-react';
-import { useAppSelector } from '../../hooks/useAppSelector';
+import { Bell, Search, User, LogOut } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../store/authSlice';
+import { RootState, AppDispatch } from '../../store';
 
 const Header: React.FC = () => {
-  const { profile } = useAppSelector((state) => state.user);
+  const dispatch: AppDispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
+  
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -11,11 +15,17 @@ const Header: React.FC = () => {
     day: 'numeric',
   });
 
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Good morning, {profile?.name?.split(' ')[0] || 'Student'}!</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Good morning, {user?.name?.split(' ')[0] || 'Student'}!
+          </h2>
           <p className="text-gray-500 mt-1">{currentDate}</p>
         </div>
 
@@ -36,12 +46,19 @@ const Header: React.FC = () => {
 
           <div className="flex items-center space-x-3">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{profile?.name}</p>
-              <p className="text-xs text-gray-500">{profile?.email}</p>
+              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { addCourse, updateCourse, deleteCourse } from '../../store/slices/coursesSlice';
+import { addCourse, updateCourse, deleteCourse, Course } from '../../store/slices/coursesSlice';
 import { Book, Clock, MapPin, User, Plus, Edit2, Trash2, Users } from 'lucide-react';
+import AddCourseModal from './AddCourseModal';
 
 const CoursesView: React.FC = () => {
   const dispatch = useAppDispatch();
   const { courses } = useAppSelector((state) => state.courses);
   const { tasks } = useAppSelector((state) => state.tasks);
   
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<any>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const getCourseStats = (courseId: string) => {
     const courseTasks = tasks.filter(task => task.courseId === courseId);
@@ -25,7 +26,7 @@ const CoursesView: React.FC = () => {
     };
   };
 
-  const CourseCard = ({ course }: { course: any }) => {
+  const CourseCard = ({ course }: { course: Course }) => {
     const stats = getCourseStats(course.id);
     
     return (
@@ -70,7 +71,7 @@ const CoursesView: React.FC = () => {
 
         <div className="space-y-3 mb-4">
           <h4 className="text-sm font-medium text-gray-900">Schedule</h4>
-          {course.schedule.map((session: any, index: number) => (
+          {course.schedule.map((session: Course['schedule'][number], index: number) => (
             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="text-sm font-medium text-gray-900">{session.day}</div>
@@ -131,7 +132,7 @@ const CoursesView: React.FC = () => {
         </div>
         
         <button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => setShowAddModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -196,13 +197,15 @@ const CoursesView: React.FC = () => {
         ))}
       </div>
 
+      <AddCourseModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
+
       {courses.length === 0 && (
         <div className="text-center py-12">
           <Book className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
           <p className="text-gray-500 mb-4">Add your first course to get started with your academic planning</p>
           <button
-            onClick={() => setShowAddForm(true)}
+            onClick={() => setShowAddModal(true)}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Add Your First Course
